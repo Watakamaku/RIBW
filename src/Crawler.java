@@ -26,31 +26,7 @@ public class Crawler implements Serializable {
         }
     }
 
-
-
-    public class PdfParse {
-
-        public static void main(final String[] args) throws IOException,TikaException {
-
-
-
-            //parsing the document using PDF parser
-
-
-            //getting the content of the document
-            System.out.println("Contents of the PDF :" + handler.toString());
-
-            //getting metadata of the document
-            System.out.println("Metadata of the PDF:");
-            String[] metadataNames = metadata.names();
-
-            for(String name : metadataNames) {
-                System.out.println(name+ " : " + metadata.get(name));
-            }
-        }
-    }
-
-    public String parsePDF(File fichero){
+    public void parsePDF(File fichero){
         try {
             BodyContentHandler handler = new BodyContentHandler();
             Metadata metadata = new Metadata();
@@ -58,11 +34,16 @@ public class Crawler implements Serializable {
             ParseContext pcontext = new ParseContext();
 
             PDFParser pdfparser = new PDFParser();
-            pdfparser.parse(inputstream, handler, metadata,pcontext);
-        } catch (FileNotFoundException e) {
+            pdfparser.parse(inputstream, handler, metadata, pcontext);
+
+            FileOutputStream flujoPDF = new FileOutputStream(new File("PDF.txt"));
+            flujoPDF.write(handler.toString().getBytes());
+
+            WordCount(new File("PDF.txt"));
+
+        } catch (SAXException | TikaException | IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public Integer obtenerPosFAT(File fichero) {
@@ -109,7 +90,7 @@ public class Crawler implements Serializable {
                     String s = st.nextToken();
                     Object o = diccionario.get(s);
                     Integer posFT = obtenerPosFAT(fichero);
-//                    System.out.print("\nLa palabra " + s + " en el archivo " + fichero.getName());
+                    System.out.print("\nLa palabra " + s + " en el archivo " + fichero.getName());
                     if (o == null) {
                         diccionario.put(s, new Ocurrencias(posFT));
                     } else {
@@ -167,8 +148,8 @@ public class Crawler implements Serializable {
         } else if (obtenerExtension(fichero).equals(".txt") || obtenerExtension(fichero).equals(".java")) {
             FAT.add(fichero);
             WordCount(fichero);
-        } else {
-//            System.out.println("Estoy en un archivo que no es un txt o un java: " + fichero.getName());
+        } else if(obtenerExtension(fichero).equals(".pdf")) {
+            parsePDF(fichero);
         }
     }
 

@@ -9,7 +9,7 @@ public class Ocurrencias implements Serializable {
     public Ocurrencias(Integer posFT) {
         oc.put(posFT, 1);
         frecuencia = 1;
-//        System.out.print(" nueva ocurrencia");
+        System.out.print(" nueva ocurrencia");
     }
 
     public void añadirOcurrencia(Integer posFT) {
@@ -21,6 +21,6 @@ public class Ocurrencias implements Serializable {
             oc.put(posFT, 1);
         }
         frecuencia++;
-//        System.out.print(" tiene una frecuencia en el archivo de " + oc.get(posFT).intValue() + " y una frecuencia total de " + frecuencia);
+        System.out.print(" tiene una frecuencia en el archivo de " + oc.get(posFT).intValue() + " y una frecuencia total de " + frecuencia);
     }
 }
