@@ -12,7 +12,7 @@ public class Ocurrencias implements Serializable {
         Crawler.getInstance().aumentarPalabrasTotales(posFT);
     }
 
-    public Map<Integer, Integer> getTree(){
+    public Map<Integer, Integer> getTree() {
         return oc;
     }
 
@@ -21,18 +21,18 @@ public class Ocurrencias implements Serializable {
             Integer cantidad = oc.get(posFT);
             oc.remove(posFT);
             oc.put(posFT, cantidad + 1);
-        }else{
+        } else {
             oc.put(posFT, 1);
         }
         frecuencia++;
         Crawler.getInstance().aumentarPalabrasTotales(posFT);
     }
 
-    public Integer getfrecuenciaTotal(){
+    public Integer getfrecuenciaTotal() {
         return frecuencia;
     }
 
-    public void show(){
+    public void show() {
         System.out.print(oc.toString() + " y aparece un total de " + frecuencia + " veces\n");
     }
 }

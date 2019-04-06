@@ -24,10 +24,13 @@ public class Crawler implements Serializable {
     private ArrayList<String> Thesauro;
     private static Crawler instance = null;
 
+    /**
+     * Constructor, crea instancias de todas las colecciones que se usan y lee todo el Thesauro
+     */
     private Crawler() {
         try {
             diccionario = new TreeMap();
-            flujoSalida = new PrintWriter("C:\\Users\\Watakamaku\\Desktop\\prueba\\salida.txt");
+            flujoSalida = new PrintWriter("Salida de Palabras.txt");
             Thesauro = new ArrayList<>();
             salida = new ArrayList<>();
             BufferedReader flujoEntrada = new BufferedReader(new FileReader("Thesauro.txt"));
@@ -47,6 +50,11 @@ public class Crawler implements Serializable {
         }
     }
 
+    /**
+     * Obtener la instancia del singleton
+     *
+     * @return
+     */
     public static Crawler getInstance() {
         if (instance == null) {
             instance = new Crawler();
@@ -54,6 +62,12 @@ public class Crawler implements Serializable {
         return instance;
     }
 
+    /**
+     * Busca una palabra dentro del Thesauro
+     *
+     * @param word
+     * @return
+     */
     public boolean findThesauro(String word) {
         for (int i = 0; i < Thesauro.size(); i++) {
             if (Thesauro.get(i).equals(word)) {
@@ -63,6 +77,11 @@ public class Crawler implements Serializable {
         return false;
     }
 
+    /**
+     * Método que se encarga de leer un PDF transformarlo en un archivo .txt y pasar el contenido al método List it y que se encarge de procesar las palabras
+     *
+     * @param fichero
+     */
     public void parsePDF(File fichero) {
         try {
             BodyContentHandler handler = new BodyContentHandler();
@@ -87,10 +106,21 @@ public class Crawler implements Serializable {
         }
     }
 
+    /**
+     * Aumenta las palabras de el archivo en la posición que se indica
+     *
+     * @param posicion
+     */
     public void aumentarPalabrasTotales(int posicion) {
         PalabrasFichero[posicion]++;
     }
 
+    /**
+     * Devuelve la posición de un Fichero dentro de la lista que lo contiene
+     *
+     * @param fichero
+     * @return
+     */
     public Integer obtenerPosFAT(File fichero) {
         for (int i = 0; i < FAT.size(); i++) {
             if (FAT.get(i).getName().equals(fichero.getName())) {
@@ -100,6 +130,9 @@ public class Crawler implements Serializable {
         return -1;
     }
 
+    /**
+     * Método que guarda todas las colecciones que necesitamos mantener en un árbol y ese árbol lo exporta para que no haya que buscar todo de nuevo
+     */
     public void saveObject() {
         Hashtable h = new Hashtable();
         h.put(KEY_DICTIONARY, diccionario);
@@ -115,6 +148,11 @@ public class Crawler implements Serializable {
         }
     }
 
+    /**
+     * Método que carga el objeto que exporta el método de encima y coloca cada colección que se guardó en el arbol de la instancia que se ha creado en el constructor
+     *
+     * @return
+     */
     public boolean loadObject() {
         try {
             FileInputStream fis = new FileInputStream("h.ser");
@@ -133,6 +171,11 @@ public class Crawler implements Serializable {
         }
     }
 
+    /**
+     * Método que procesa un fichero, coge una linea entera, la trozea, y si no aparece en el Thesauro la indexa aparte de escribirla en un archivo junto a su ocurrencia (ESTO SOLO FUNCIONA EN LINUX POR ALGÚN EXTRAÑO MOTIVO)
+     *
+     * @param fichero
+     */
     public void WordCount(File fichero) {
         try {
             BufferedReader flujoEntrada = new BufferedReader(new FileReader(fichero));
@@ -186,6 +229,11 @@ public class Crawler implements Serializable {
         return nombre.substring(tamanoExtension);
     }
 
+    /**
+     * Coge un fichero de entrada que lee todos los archivos de una ruta, si lo que lee es un directorio realiza una llamada recursiva para procesar la subcarpeta, en el casode que sea un archivo .java, .txt o .pdf lo lee y lo procesa
+     *
+     * @param fichero
+     */
     public void ListIt(File fichero) {
 
         if (!fichero.exists()) {
@@ -206,6 +254,9 @@ public class Crawler implements Serializable {
         }
     }
 
+    /**
+     * Método que muestra los archivos con sus idenficadores y las palabras con sus frecuencias
+     */
     public void show() {
         List claves = new ArrayList(diccionario.keySet());
         Collections.sort(claves);
@@ -228,13 +279,16 @@ public class Crawler implements Serializable {
         System.out.println("****************************************************************************************\n\n");
     }
 
+    /**
+     * Método que muestra la salida correcta de los archivos ya ordenados por el ranking
+     */
     public void mostrarSalidaCorrecta() {
         ArrayList<Integer> salidaCorrecta = new ArrayList<>();
         Puntuacion mejor;
         int loops = salida.size();
-        while(loops > 0) {
+        while (loops > 0) {
             mejor = new Puntuacion(-1, -1);
-            for (int i = 0; i< salida.size(); i++) {
+            for (int i = 0; i < salida.size(); i++) {
                 if (salida.get(i).getPuntuacion() > mejor.getPuntuacion()) {
                     mejor = salida.get(i);
                 }
@@ -244,10 +298,15 @@ public class Crawler implements Serializable {
             salida.remove(mejor);
         }
         for (int i = 0; i < salidaCorrecta.size(); i++) {
-            System.out.println((i+1) + ".- " + FAT.get(salidaCorrecta.get(i)).getName());
+            System.out.println((i + 1) + ".- " + FAT.get(salidaCorrecta.get(i)).getName());
         }
     }
 
+    /**
+     * Método que sirve para buscar palabras, comprueba si esta en el diccionario, si está, coge todos los archivos en los que aparece y les aplica el ranking para procesarlos
+     *
+     * @param palabra
+     */
     public void Buscar(String palabra) {
         List claves = new ArrayList(diccionario.keySet());
 
@@ -258,7 +317,7 @@ public class Crawler implements Serializable {
                 enc = true;
                 Ocurrencias o = diccionario.get(palabraDiccionario);
                 for (Integer numArchivo : o.getTree().keySet()) {
-                    float puntuacion = (o.getTree().get(numArchivo)*100) /PalabrasFichero[numArchivo];
+                    float puntuacion = (o.getTree().get(numArchivo) * 1000000) / PalabrasFichero[numArchivo];
                     salida.add(new Puntuacion(puntuacion, numArchivo));
                 }
                 mostrarSalidaCorrecta();
