@@ -3,13 +3,17 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Ocurrencias implements Serializable {
-    Map<Integer, Integer> oc = new TreeMap<>();
-    Integer frecuencia;
+    private Map<Integer, Integer> oc = new TreeMap<>();
+    private Integer frecuencia;
 
     public Ocurrencias(Integer posFT) {
         oc.put(posFT, 1);
         frecuencia = 1;
-        System.out.print(" nueva ocurrencia");
+        Crawler.getInstance().aumentarPalabrasTotales(posFT);
+    }
+
+    public Map<Integer, Integer> getTree(){
+        return oc;
     }
 
     public void añadirOcurrencia(Integer posFT) {
@@ -21,6 +25,14 @@ public class Ocurrencias implements Serializable {
             oc.put(posFT, 1);
         }
         frecuencia++;
-        System.out.print(" tiene una frecuencia en el archivo de " + oc.get(posFT).intValue() + " y una frecuencia total de " + frecuencia);
+        Crawler.getInstance().aumentarPalabrasTotales(posFT);
+    }
+
+    public Integer getfrecuenciaTotal(){
+        return frecuencia;
+    }
+
+    public void show(){
+        System.out.print(oc.toString() + " y aparece un total de " + frecuencia + " veces\n");
     }
 }
